@@ -21,13 +21,13 @@ func NewCommandController(
 	store app.OrderStore,
 	ep event.Publisher,
 	timeout time.Duration,
-) (*CommandController, error) {
+) (CommandController, error) {
 	sender, err := app.NewMediator(store, ep, timeout)
 	if err != nil {
-		return nil, err
+		return CommandController{}, err
 	}
 
-	return &CommandController{
+	return CommandController{
 		sender: sender,
 	}, nil
 }

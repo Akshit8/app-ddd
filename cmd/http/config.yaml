@@ -1,0 +1,9 @@
+environment: dev
+
+appName: app-ddd
+
+server:
+  port: :8080
+  timeout: 30
+context:
+  timeout: 20

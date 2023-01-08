@@ -1,6 +1,7 @@
 package inmem
 
 import (
+	"context"
 	"sync"
 
 	"github.com/Akshit8/app-ddd/internal/domain"
@@ -18,7 +19,7 @@ func NewOrderRepository() *OrderRepository {
 	}
 }
 
-func (r *OrderRepository) Save(order *domain.Order) error {
+func (r *OrderRepository) Create(_ context.Context, order *domain.Order) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -27,7 +28,16 @@ func (r *OrderRepository) Save(order *domain.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) Get(id string) (*domain.Order, error) {
+func (r *OrderRepository) Update(_ context.Context, order *domain.Order) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	r.orders[order.ID()] = order
+
+	return nil
+}
+
+func (r *OrderRepository) Get(_ context.Context, id string) (*domain.Order, error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
@@ -39,7 +49,7 @@ func (r *OrderRepository) Get(id string) (*domain.Order, error) {
 	return order, nil
 }
 
-func (r *OrderRepository) GetAll() ([]*domain.Order, error) {
+func (r *OrderRepository) GetAll(_ context.Context) ([]*domain.Order, error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
@@ -51,7 +61,7 @@ func (r *OrderRepository) GetAll() ([]*domain.Order, error) {
 	return orders, nil
 }
 
-func (r *OrderRepository) Delete(id string) error {
+func (r *OrderRepository) Delete(_ context.Context, id string) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

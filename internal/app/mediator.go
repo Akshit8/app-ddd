@@ -10,7 +10,7 @@ import (
 	"github.com/eyazici90/go-mediator/mediator"
 )
 
-type OrderStore struct {
+type OrderStore interface {
 	command.OrderCreator
 	command.OrderUpdater
 	command.OrderGetter

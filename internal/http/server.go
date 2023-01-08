@@ -25,12 +25,17 @@ type Server struct {
 }
 
 func NewServer(config Config, queryController QueryController, commandController CommandController) *Server {
-	return &Server{
+	s := &Server{
 		config:            config,
 		echo:              echo.New(),
 		queryController:   queryController,
 		commandController: commandController,
 	}
+
+	s.useMiddleware()
+	s.useRoutes()
+
+	return s
 }
 
 func (s *Server) Start() error {

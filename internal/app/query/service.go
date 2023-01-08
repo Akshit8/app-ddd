@@ -7,8 +7,8 @@ import (
 )
 
 type OrderQueryStore interface {
-	GetOrder(ctx context.Context, id string) (*domain.Order, error)
-	GetOrders(context.Context) ([]*domain.Order, error)
+	Get(ctx context.Context, id string) (*domain.Order, error)
+	GetAll(context.Context) ([]*domain.Order, error)
 }
 
 type OrderQueryService struct {
@@ -22,7 +22,7 @@ func NewOrderQueryService(store OrderQueryStore) *OrderQueryService {
 }
 
 func (s *OrderQueryService) GetOrder(ctx context.Context, id string) *GetOrderDTO {
-	order, err := s.store.GetOrder(ctx, id)
+	order, err := s.store.Get(ctx, id)
 	if err != nil {
 		return nil
 	}
@@ -35,7 +35,7 @@ func (s *OrderQueryService) GetOrder(ctx context.Context, id string) *GetOrderDT
 }
 
 func (s *OrderQueryService) GetOrders(ctx context.Context) *GetOrdersDTO {
-	orders, err := s.store.GetOrders(ctx)
+	orders, err := s.store.GetAll(ctx)
 	if err != nil {
 		return nil
 	}
