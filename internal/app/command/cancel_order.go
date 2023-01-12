@@ -4,34 +4,29 @@ import (
 	"context"
 
 	"github.com/Akshit8/app-ddd/internal/domain"
-	"github.com/eyazici90/go-mediator/mediator"
 )
 
-type CanceOrder struct {
-	OrderID string `validate:"required,min=10"`
-}
-
-func (CanceOrder) Key() int {
-	return cancelCommandKey
+type CancelOrderRequest struct {
+	OrderID string `validate:"required,uuid4"`
 }
 
 type CancelOrderHandler struct {
 	orderHandler
 }
 
-func NewCancelOrderHandler(orderGetter OrderGetter, orderUpdater OrderUpdater) CancelOrderHandler {
-	return CancelOrderHandler{
+func NewCancelOrderHandler(orderGetter OrderGetter, orderUpdater OrderUpdater) *CancelOrderHandler {
+	return &CancelOrderHandler{
 		orderHandler: newOrderHandler(orderGetter, orderUpdater),
 	}
 }
 
-func (h CancelOrderHandler) Handle(ctx context.Context, msg mediator.Message) error {
-	cmd, ok := msg.(CanceOrder)
-	if !ok {
-		return ErrInvalidCommand
-	}
-
-	return h.update(ctx, cmd.OrderID, func(order *domain.Order) {
+func (h *CancelOrderHandler) Handle(ctx context.Context, cancelOrderRequest *CancelOrderRequest) (interface{}, error) {
+	err := h.update(ctx, cancelOrderRequest.OrderID, func(order *domain.Order) {
 		order.Cancel()
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }

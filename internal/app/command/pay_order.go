@@ -4,15 +4,10 @@ import (
 	"context"
 
 	"github.com/Akshit8/app-ddd/internal/domain"
-	"github.com/eyazici90/go-mediator/mediator"
 )
 
-type PayOrder struct {
-	OrderID string `validate:"required,min=10"`
-}
-
-func (PayOrder) Key() int {
-	return payCommandKey
+type PayOrderRequest struct {
+	OrderID string `validate:"required,uuid4"`
 }
 
 type PayOrderHandler struct {
@@ -25,13 +20,13 @@ func NewPayOrderHandler(orderGetter OrderGetter, orderUpdater OrderUpdater) PayO
 	}
 }
 
-func (h PayOrderHandler) Handle(ctx context.Context, msg mediator.Message) error {
-	cmd, ok := msg.(PayOrder)
-	if !ok {
-		return ErrInvalidCommand
-	}
-
-	return h.update(ctx, cmd.OrderID, func(order *domain.Order) {
+func (h PayOrderHandler) Handle(ctx context.Context, payOrderRequest *PayOrderRequest) (interface{}, error) {
+	err := h.update(ctx, payOrderRequest.OrderID, func(order *domain.Order) {
 		order.Pay()
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }

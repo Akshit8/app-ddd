@@ -8,13 +8,6 @@ import (
 	"github.com/Akshit8/app-ddd/pkg/aggregate"
 )
 
-const (
-	createCommandKey int = iota + 1
-	payCommandKey
-	cancelCommandKey
-	shipCommandKey
-)
-
 type (
 	OrderGetter interface {
 		Get(context.Context, string) (*domain.Order, error)

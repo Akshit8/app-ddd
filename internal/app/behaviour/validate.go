@@ -2,17 +2,23 @@ package behaviour
 
 import (
 	"context"
+	"log"
+	"reflect"
 
-	"github.com/eyazici90/go-mediator/mediator"
 	"github.com/go-playground/validator/v10"
+	"github.com/mehdihadeli/go-mediatr"
 )
 
 var validate = validator.New()
 
-func Validate(ctx context.Context, msg mediator.Message, next mediator.Next) error {
-	if err := validate.Struct(msg); err != nil {
-		return err
+type ValidationBehaviour struct{}
+
+func (ValidationBehaviour) Handle(ctx context.Context, req interface{}, next mediatr.RequestHandlerFunc) (interface{}, error) {
+	log.Println("Validating the command:", reflect.TypeOf(req))
+
+	if err := validate.Struct(req); err != nil {
+		return nil, err
 	}
 
-	return next(ctx)
+	return next()
 }

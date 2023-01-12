@@ -5,17 +5,20 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/eyazici90/go-mediator/mediator"
+	"github.com/mehdihadeli/go-mediatr"
 )
 
-func Logger(ctx context.Context, msg mediator.Message, next mediator.Next) error {
-	log.Println("Starting to Process the command:", reflect.TypeOf(msg))
+type LoggingBehaviour struct{}
 
-	if err := next(ctx); err != nil {
-		return err
+func (LoggingBehaviour) Handle(ctx context.Context, req interface{}, next mediatr.RequestHandlerFunc) (interface{}, error) {
+	log.Println("Starting to Process the command:", reflect.TypeOf(req))
+
+	res, err := next()
+	if err != nil {
+		return nil, err
 	}
 
-	log.Println("Ending to Process the command:", reflect.TypeOf(msg))
+	log.Println("Ending to Process the command:", reflect.TypeOf(req))
 
-	return nil
+	return res, nil
 }

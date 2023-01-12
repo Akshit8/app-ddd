@@ -7,6 +7,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/Akshit8/app-ddd/internal/app"
 	"github.com/Akshit8/app-ddd/internal/app/query"
 	"github.com/Akshit8/app-ddd/internal/http"
 	"github.com/Akshit8/app-ddd/internal/infra"
@@ -32,10 +33,9 @@ func main() {
 	service := query.NewOrderQueryService(orderRepostiory)
 	ep := infra.NewConsoleBus()
 
-	commandController, err := http.NewCommandController(
-		orderRepostiory, ep, time.Duration(cfg.Context.Timeout)*time.Second)
-	must.NotFail(err)
+	app.SetupMediator(orderRepostiory, ep)
 
+	commandController := http.CommandController{}
 	queryController := http.NewQueryController(service)
 
 	e := echo.New()
@@ -49,12 +49,14 @@ func main() {
 		}
 	}()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.Server.Timeout)*time.Second)
-	defer cancel()
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.Server.Timeout)*time.Second)
+		defer cancel()
+
+		if err := srv.Shutdown(ctx); err != nil {
+			srv.Fatal(err)
+		}
+	}()
 
 	graceful.Run()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		srv.Fatal(err)
-	}
 }

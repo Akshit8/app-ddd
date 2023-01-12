@@ -4,22 +4,27 @@ import (
 	"context"
 	"time"
 
-	"github.com/eyazici90/go-mediator/mediator"
+	"github.com/mehdihadeli/go-mediatr"
 )
 
-type Cancel struct {
+type CreateCancelContextBehaviout struct {
 	timeout time.Duration
 }
 
-func NewCancel(timeout time.Duration) *Cancel {
-	return &Cancel{
+func NewCancel(timeout time.Duration) *CreateCancelContextBehaviout {
+	return &CreateCancelContextBehaviout{
 		timeout: timeout,
 	}
 }
 
-func (c *Cancel) Process(ctx context.Context, _ mediator.Message, next mediator.Next) error {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
-	defer cancel()
+func (c *CreateCancelContextBehaviout) Handle(
+	ctx context.Context,
+	req interface{},
+	next mediatr.RequestHandlerFunc,
+) (interface{}, error) {
+	// Not possible to modify context here
+	// ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	// defer cancel()
 
-	return next(ctx)
+	return next()
 }

@@ -7,39 +7,29 @@ import (
 
 	"github.com/Akshit8/app-ddd/internal/domain"
 	"github.com/Akshit8/app-ddd/pkg/aggregate"
-	"github.com/eyazici90/go-mediator/mediator"
 )
 
 type OrderCreator interface {
 	Create(context.Context, *domain.Order) error
 }
 
-type CreateOrder struct {
-	ID string `validate:"required,min=10"`
-}
-
-func (CreateOrder) Key() int {
-	return createCommandKey
+type CreateOrderRequest struct {
+	ID string `validate:"required,uuid4"`
 }
 
 type CreateOrderHandler struct {
 	creator OrderCreator
 }
 
-func NewCreateOrderHandler(creator OrderCreator) CreateOrderHandler {
-	return CreateOrderHandler{
+func NewCreateOrderHandler(creator OrderCreator) *CreateOrderHandler {
+	return &CreateOrderHandler{
 		creator: creator,
 	}
 }
 
-func (h CreateOrderHandler) Handle(ctx context.Context, msg mediator.Message) error {
-	cmd, ok := msg.(CreateOrder)
-	if !ok {
-		return ErrInvalidCommand
-	}
-
+func (h CreateOrderHandler) Handle(ctx context.Context, createOrder *CreateOrderRequest) (interface{}, error) {
 	order, err := domain.NewOrder(
-		domain.OrderID(cmd.ID),
+		domain.OrderID(createOrder.ID),
 		domain.NewCustomerID(),
 		domain.NewProductID(),
 		time.Now,
@@ -47,8 +37,13 @@ func (h CreateOrderHandler) Handle(ctx context.Context, msg mediator.Message) er
 		aggregate.NewVersion(),
 	)
 	if err != nil {
-		return fmt.Errorf("creating order: %w", err)
+		return nil, fmt.Errorf("creating order: %w", err)
 	}
 
-	return h.creator.Create(ctx, order)
+	err = h.creator.Create(ctx, order)
+	if err != nil {
+		return nil, fmt.Errorf("creating order: %w", err)
+	}
+
+	return nil, nil
 }

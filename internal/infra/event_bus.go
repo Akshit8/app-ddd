@@ -5,19 +5,19 @@ import (
 	"reflect"
 )
 
-type ConsoleBus struct {
+type ConsoleEventBus struct {
 }
 
-func NewConsoleBus() *ConsoleBus {
-	return &ConsoleBus{}
+func NewConsoleBus() *ConsoleEventBus {
+	return &ConsoleEventBus{}
 }
 
-func (ConsoleBus) Publish(event interface{}) {
-	fmt.Println("Publishing event:", reflect.TypeOf(event).Name())
+func (ConsoleEventBus) Publish(event interface{}) {
+	fmt.Println("Publishing event:", reflect.TypeOf(event).Name(), event)
 }
 
-func (ConsoleBus) PublishAll(events ...interface{}) {
+func (ConsoleEventBus) PublishAll(events ...interface{}) {
 	for _, event := range events {
-		fmt.Println("Publishing event:", reflect.TypeOf(event).Name())
+		fmt.Println("Publishing event:", reflect.TypeOf(event).Name(), event)
 	}
 }
